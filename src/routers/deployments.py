@@ -5,6 +5,7 @@ router = APIRouter(
     prefix='/deployments'
 )
 
-@router.get("/testing/")
+
+@router.post("")
 async def testing_docs():
     return "thank you"
