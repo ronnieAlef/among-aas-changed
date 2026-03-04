@@ -1,4 +1,9 @@
-from fastapi import APIRouter
+from typing import Annotated
+
+from fastapi import APIRouter, Body
+
+from src.reposetories.deployments import create_new_mongo_db
+from src.requests.create_db_request import CreateDbRequest
 
 router = APIRouter(
     tags=['deployments'],
@@ -7,5 +12,5 @@ router = APIRouter(
 
 
 @router.post("")
-async def testing_docs():
-    return "thank you"
+async def create_new_db(create_db_request: Annotated[CreateDbRequest, Body()]):
+    create_new_mongo_db(create_db_request)
