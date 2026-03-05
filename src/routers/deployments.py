@@ -37,7 +37,7 @@ async def update_db_name(new_db_name: Annotated[RenameDbRequest, Body()], deploy
     generated_id = change_db_name(new_db_name, deployment_id)
     json_text = {"id": generated_id}
     # TODO: return better response
-    return json_text
+    return "sorry:("
 
 
 @router.delete("")

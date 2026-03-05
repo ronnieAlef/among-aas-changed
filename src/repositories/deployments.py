@@ -55,18 +55,32 @@ def return_deployment_details(deployment_id: str) -> Deployment:
         return data
 
 
-def change_db_name(rename_db_request: RenameDbRequest, deployment_id: str) -> UUID:
+def change_db_name(rename_db_request: RenameDbRequest, deployment_id: str):
     # TODO: change name in mongo
 
-    with engine.begin() as connection:
-        stmt = (
-            update(deployment_table)
-            .where(deployment_table.c.id == deployment_id)
-            .values(db_name=rename_db_request.db_name))
+    old_db_name = return_deployment_details(deployment_id).db_name
 
-        result = connection.execute(stmt)
-        generated_id = result.inserted_primary_key[0]
-        return generated_id
+
+    source_db = mongo_connection[old_db_name]
+    target_db = mongo_connection[rename_db_request.db_name]
+    collection_names = source_db.list_collection_names()
+
+    for collection_name in collection_names:
+        source_collection = source_db[collection_name]
+        target_collection = target_db[collection_name]
+
+        documents = source_collection.find()
+
+        # TODO: add logs
+        doc_list = list(documents)
+        if doc_list:
+            target_collection.insert_many(doc_list)
+            print(f"Copied {len(doc_list)} documents from '{collection_name}'")
+
+    db_details = return_deployment_details(deployment_id)
+    mongo_connection.drop_database(db_details.db_name)
+
+    __change_db_name_postgres__(rename_db_request, deployment_id)
 
 
 def delete_mongo_db(deployment_id: str):
@@ -106,4 +120,13 @@ def __edit_deployment_status__(status: Literal["DELETED", "CREATED"], deployment
         generated_id = result.inserted_primary_key[0]
         return generated_id
 
+
+def __change_db_name_postgres__(rename_db_request: RenameDbRequest, deployment_id: str):
+    with engine.begin() as connection:
+        stmt = (
+            update(deployment_table)
+            .where(deployment_table.c.id == deployment_id)
+            .values(db_name=rename_db_request.db_name))
+
+        connection.execute(stmt)
 
