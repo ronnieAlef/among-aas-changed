@@ -20,7 +20,6 @@ app.include_router(deployments_router)
 #         )
 
 
-
 if __name__ == "__main__":
 
     connect_to_postgres()
