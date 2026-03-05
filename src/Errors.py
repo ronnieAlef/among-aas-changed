@@ -19,3 +19,13 @@ class InvalidInputException(AmongAasException):
             error_code="item_not_found",
             status_code=404
         )
+
+
+class InvalidUsernameException(AmongAasException):
+    def __init__(self, username: str):
+
+        super().__init__(
+            message=f"{username} is invalid.",
+            error_code="invalid username",
+            status_code=409
+        )

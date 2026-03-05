@@ -11,6 +11,8 @@ from pymongo import MongoClient
 from sqlalchemy import insert, select, Row, update, bindparam
 from sqlalchemy.orm import sessionmaker
 
+from src.Errors import InvalidUsernameException
+from src.headers.delete_db_header import DeleteDbHeader
 from src.models.deployment import Deployment
 from src.postgres_client import connect_to_postgres, deployment_table
 from src.requests.create_db_request import CreateDbRequest
@@ -82,14 +84,19 @@ def change_db_name(rename_db_request: RenameDbRequest, deployment_id: str):
     __change_db_name_postgres__(rename_db_request, deployment_id)
 
 
-def delete_mongo_db(deployment_id: str):
+def delete_mongo_db(deployment_id: str, delete_db_header: DeleteDbHeader):
     with mongo_connection.start_session() as session:
         with session.start_transaction():
             try:
                 db_details = return_deployment_details(deployment_id)
-                mongo_connection.drop_database(db_details.db_name)
-                __edit_deployment_status__("DELETED", deployment_id)
-                return db_details.id
+
+                if db_details.username == delete_db_header.username:
+                    mongo_connection.drop_database(db_details.db_name)
+                    __edit_deployment_status__("DELETED", deployment_id)
+                    return db_details.id
+                else:
+                    #TODO: bubble it ap that the code didn't execute
+                    raise InvalidUsernameException(delete_db_header.username)
 
             except Exception as e:
                 print("An error occurred:", e)
