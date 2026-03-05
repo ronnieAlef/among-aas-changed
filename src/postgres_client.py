@@ -1,6 +1,7 @@
 import uuid
 
-from sqlalchemy import Table, Column, MetaData, Integer, Computed, Identity, String, func, DateTime, create_engine, UUID
+from sqlalchemy import Table, Column, MetaData, String, DateTime, create_engine, UUID
+from sqlalchemy.orm import sessionmaker
 
 metadata = MetaData()
 
@@ -23,5 +24,7 @@ def connect_to_postgres():
     port = 5432
 
     engine = create_engine(f"postgresql+psycopg://{user}:{password}@{host_name}:{port}/{db_name}")
+    session = sessionmaker(bind=engine)
 
-    metadata.create_all(engine)
+    with session.begin() as conn:
+        metadata.create_all(engine)

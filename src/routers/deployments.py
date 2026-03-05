@@ -2,7 +2,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Body
 
-from src.reposetories.deployments import create_new_mongo_db
+from src.riposetories.deployments import create_new_mongo_db
 from src.requests.create_db_request import CreateDbRequest
 
 router = APIRouter(
