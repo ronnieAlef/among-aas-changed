@@ -28,6 +28,11 @@ def connect_to_postgres():
                            f"{config['POSTGRES_CONNECTION']['port']}/"
                            f"{config['POSTGRES_CONNECTION']['db_name']}")
 
+    return engine
+
+
+def create_table():
+    engine = connect_to_postgres()
     session = sessionmaker(bind=engine)
 
     with session.begin():
