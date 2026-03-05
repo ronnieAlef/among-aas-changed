@@ -60,7 +60,6 @@ def change_db_name(rename_db_request: RenameDbRequest, deployment_id: str):
 
     old_db_name = return_deployment_details(deployment_id).db_name
 
-
     source_db = mongo_connection[old_db_name]
     target_db = mongo_connection[rename_db_request.db_name]
     collection_names = source_db.list_collection_names()
@@ -89,9 +88,8 @@ def delete_mongo_db(deployment_id: str):
             try:
                 db_details = return_deployment_details(deployment_id)
                 mongo_connection.drop_database(db_details.db_name)
-
-                generated_id = __edit_deployment_status__("DELETED", deployment_id)
-                return generated_id
+                __edit_deployment_status__("DELETED", deployment_id)
+                return db_details.id
 
             except Exception as e:
                 print("An error occurred:", e)
@@ -116,9 +114,7 @@ def __edit_deployment_status__(status: Literal["DELETED", "CREATED"], deployment
             .where(deployment_table.c.id == deployment_id)
             .values(status=status))
 
-        result = connection.execute(stmt)
-        generated_id = result.inserted_primary_key[0]
-        return generated_id
+        connection.execute(stmt)
 
 
 def __change_db_name_postgres__(rename_db_request: RenameDbRequest, deployment_id: str):
