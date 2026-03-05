@@ -18,6 +18,6 @@ async def create_new_db(create_db_request: Annotated[CreateDbRequest, Body()]):
 
 
 @router.get("")
-async def get_deployment_details(deployment_id: uuid):
+async def get_deployment_details(deployment_id: str):
     pass
 

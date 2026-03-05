@@ -1,3 +1,5 @@
+import configparser
+
 import uvicorn
 from fastapi import FastAPI
 
@@ -9,6 +11,7 @@ app.include_router(deployments_router)
 
 
 if __name__ == "__main__":
+
     connect_to_postgres()
     uvicorn.run(app, host="127.0.0.1", port=8080)
 

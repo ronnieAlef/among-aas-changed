@@ -1,3 +1,4 @@
+import configparser
 import uuid
 
 from sqlalchemy import Table, Column, MetaData, String, DateTime, create_engine, UUID
@@ -17,13 +18,16 @@ deployment_table = Table(
 
 
 def connect_to_postgres():
-    db_name = "oltp_db"
-    user = "ronnie"
-    password = "213248"
-    host_name = "localhost"
-    port = 5432
 
-    engine = create_engine(f"postgresql+psycopg://{user}:{password}@{host_name}:{port}/{db_name}")
+    config = configparser.ConfigParser()
+    config.read("config.ini")
+
+    engine = create_engine(f"postgresql+psycopg://{config['POSTGRES_CONNECTION']['user']}:"
+                           f"{config['POSTGRES_CONNECTION']['password']}@"
+                           f"{config['POSTGRES_CONNECTION']['host_name']}:"
+                           f"{config['POSTGRES_CONNECTION']['port']}/"
+                           f"{config['POSTGRES_CONNECTION']['db_name']}")
+
     session = sessionmaker(bind=engine)
 
     with session.begin():
