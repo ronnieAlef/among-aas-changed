@@ -13,8 +13,8 @@ def create_new_mongo_db(create_db_request: CreateDbRequest):
 
             new_db = connection[create_db_request.db_name]
             new_db.mycoll.insert_one({"test": 'test'})
-            print(connection.list_database_names())
             __write_deployment_to_postgres(create_db_request)
+
             session.commit_transaction()
 
         except Exception as e:

@@ -26,5 +26,5 @@ def connect_to_postgres():
     engine = create_engine(f"postgresql+psycopg://{user}:{password}@{host_name}:{port}/{db_name}")
     session = sessionmaker(bind=engine)
 
-    with session.begin() as conn:
+    with session.begin():
         metadata.create_all(engine)

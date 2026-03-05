@@ -1,3 +1,4 @@
+import uuid
 from typing import Annotated
 
 from fastapi import APIRouter, Body
@@ -14,3 +15,9 @@ router = APIRouter(
 @router.post("")
 async def create_new_db(create_db_request: Annotated[CreateDbRequest, Body()]):
     create_new_mongo_db(create_db_request)
+
+
+@router.get("")
+async def get_deployment_details(deployment_id: uuid):
+    pass
+
