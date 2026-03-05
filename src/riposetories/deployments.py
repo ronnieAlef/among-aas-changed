@@ -3,7 +3,6 @@ import datetime
 
 from pymongo import MongoClient
 from sqlalchemy import insert
-from sqlalchemy.orm import Session, sessionmaker
 
 from src.postgres_client import connect_to_postgres, deployment_table
 from src.requests.create_db_request import CreateDbRequest
