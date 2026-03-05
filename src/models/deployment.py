@@ -6,7 +6,7 @@ from pydantic import BaseModel
 
 
 class Deployment(BaseModel):
-    id: uuid
+    id: uuid.UUID
     db_name: str
     status: Literal["DELETED", "CREATED"]
     username: str

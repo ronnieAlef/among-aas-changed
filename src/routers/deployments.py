@@ -1,11 +1,11 @@
-import uuid
 from typing import Annotated
 
 from fastapi import APIRouter, Body
 from starlette import status
 from starlette.responses import JSONResponse
 
-from src.riposetories.deployments import create_new_mongo_db
+from src.models.deployment import Deployment
+from src.repositories.deployments import create_new_mongo_db, return_deployment_details
 from src.requests.create_db_request import CreateDbRequest
 
 router = APIRouter(
@@ -23,7 +23,9 @@ async def create_new_db(create_db_request: Annotated[CreateDbRequest, Body()]):
         return JSONResponse(content="error", status_code=status.HTTP_400_BAD_REQUEST)
 
 
-@router.get("")
+@router.get("", response_model=Deployment)
 async def get_deployment_details(deployment_id: str):
-    pass
+
+    data = return_deployment_details(deployment_id)
+    return data
 
