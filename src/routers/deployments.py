@@ -5,7 +5,7 @@ from starlette import status
 from starlette.responses import JSONResponse
 
 from src.models.deployment import Deployment
-from src.repositories.deployments import create_new_mongo_db, return_deployment_details, change_db_name
+from src.repositories.deployments import create_new_mongo_db, return_deployment_details, change_db_name, delete_mongo_db
 from src.requests.create_db_request import CreateDbRequest
 from src.requests.rename_db_request import RenameDbRequest
 
@@ -39,4 +39,11 @@ async def update_db_name(new_db_name: Annotated[RenameDbRequest, Body()], deploy
     # TODO: return better response
     return json_text
 
+
+@router.delete("")
+async def delete_db(deployment_id: str):
+    generated_id = delete_mongo_db(deployment_id)
+    json_text = {"id": generated_id}
+    # TODO: return better response
+    return json_text
 

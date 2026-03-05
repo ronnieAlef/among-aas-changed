@@ -3,6 +3,7 @@ from __future__ import annotations
 import configparser
 import datetime
 import json
+from typing import Literal
 from uuid import UUID
 
 from pydantic import parse_obj_as
@@ -42,7 +43,7 @@ def create_new_mongo_db(create_db_request: CreateDbRequest) -> UUID:
                 session.abort_transaction()
 
 
-def return_deployment_details(deployment_id: str):
+def return_deployment_details(deployment_id: str) -> Deployment:
     with Session.begin():
 
         stmt = select(deployment_table).where(deployment_table.c.id == deployment_id)
@@ -55,6 +56,7 @@ def return_deployment_details(deployment_id: str):
 
 
 def change_db_name(rename_db_request: RenameDbRequest, deployment_id: str) -> UUID:
+    # TODO: change name in mongo
 
     with engine.begin() as connection:
         stmt = (
@@ -67,6 +69,21 @@ def change_db_name(rename_db_request: RenameDbRequest, deployment_id: str) -> UU
         return generated_id
 
 
+def delete_mongo_db(deployment_id: str):
+    with mongo_connection.start_session() as session:
+        with session.start_transaction():
+            try:
+                db_details = return_deployment_details(deployment_id)
+                mongo_connection.drop_database(db_details.db_name)
+
+                generated_id = __edit_deployment_status__("DELETED", deployment_id)
+                return generated_id
+
+            except Exception as e:
+                print("An error occurred:", e)
+                session.abort_transaction()
+
+
 def __write_deployment_to_postgres__(create_db_request: CreateDbRequest) -> UUID:
     with engine.begin() as connection:
         insertion = insert(deployment_table).values(db_name=create_db_request.db_name,
@@ -76,3 +93,17 @@ def __write_deployment_to_postgres__(create_db_request: CreateDbRequest) -> UUID
         result = connection.execute(insertion)
         generated_id = result.inserted_primary_key[0]
         return generated_id
+
+
+def __edit_deployment_status__(status: Literal["DELETED", "CREATED"], deployment_id: str):
+    with engine.begin() as connection:
+        stmt = (
+            update(deployment_table)
+            .where(deployment_table.c.id == deployment_id)
+            .values(status=status))
+
+        result = connection.execute(stmt)
+        generated_id = result.inserted_primary_key[0]
+        return generated_id
+
+
