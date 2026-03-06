@@ -29,3 +29,5 @@ class InvalidUsernameException(AmongAasException):
             error_code="invalid username",
             status_code=409
         )
+
+

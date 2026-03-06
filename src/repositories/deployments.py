@@ -57,7 +57,6 @@ def return_deployment_details(deployment_id: str) -> Deployment:
 
 
 def change_db_name(rename_db_request: RenameDbRequest, deployment_id: str):
-    # TODO: change name in mongo
 
     old_db_name = return_deployment_details(deployment_id).db_name
 
@@ -71,7 +70,6 @@ def change_db_name(rename_db_request: RenameDbRequest, deployment_id: str):
 
         documents = source_collection.find()
 
-        # TODO: add logs
         doc_list = list(documents)
         if doc_list:
             target_collection.insert_many(doc_list)
@@ -94,7 +92,6 @@ def delete_mongo_db(deployment_id: str, delete_db_header: DeleteDbHeader):
                     __edit_deployment_status__("DELETED", deployment_id)
                     return db_details.id
                 else:
-                    #TODO: bubble it ap that the code didn't execute
                     raise InvalidUsernameException(delete_db_header.username)
 
             except Exception as e:
