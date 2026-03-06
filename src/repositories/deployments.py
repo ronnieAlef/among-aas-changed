@@ -2,21 +2,19 @@ from __future__ import annotations
 
 import configparser
 import datetime
-import json
 from typing import Literal
 from uuid import UUID
 
-from pydantic import parse_obj_as
 from pymongo import MongoClient
-from sqlalchemy import insert, select, Row, update, bindparam
+from sqlalchemy import insert, select, update
 from sqlalchemy.orm import sessionmaker
 
-from src.Errors import InvalidUsernameException
-from src.headers.delete_db_header import DeleteDbHeader
+from src.Errors import InvalidUsernameException, AmongAasException
+from src.models.headers.delete_db_header import DeleteDbHeader
 from src.models.deployment import Deployment
 from src.postgres_client import connect_to_postgres, deployment_table
-from src.requests.create_db_request import CreateDbRequest
-from src.requests.rename_db_request import RenameDbRequest
+from src.models.requests.create_db_request import CreateDbRequest
+from src.models.requests.rename_db_request import RenameDbRequest
 
 config = configparser.ConfigParser()
 config.read("config.ini")
@@ -43,6 +41,7 @@ def create_new_mongo_db(create_db_request: CreateDbRequest) -> UUID:
             except Exception as e:
                 print("An error occurred:", e)
                 session.abort_transaction()
+                raise AmongAasException
 
 
 def return_deployment_details(deployment_id: str) -> Deployment:

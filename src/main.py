@@ -1,23 +1,13 @@
 import uvicorn
-from fastapi import FastAPI, Request
-from starlette.responses import JSONResponse
+from fastapi import FastAPI
 
 from routers import deployments_router
-from src.Errors import AmongAasException
+from src.exception_handlers import register_exception_handlers
 from src.postgres_client import connect_to_postgres
 
 app = FastAPI()
 app.include_router(deployments_router)
-
-
-# def register_exception_handlers(app):
-#     @app.exception_handler(AmongAasException)
-#     async def unicorn_exception_handler(request: Request, exc: AmongAasException):
-#         return JSONResponse(
-#             status_code=exc.status_code,
-#             content={"error": exc.error_code,
-#                      "message": exc.message},
-#         )
+register_exception_handlers(app)
 
 
 if __name__ == "__main__":
